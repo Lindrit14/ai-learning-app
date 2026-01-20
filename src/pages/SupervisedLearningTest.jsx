@@ -21,7 +21,7 @@ function SupervisedLearningTest() {
             Supervised Learning mit TensorFlow.js
           </h1>
           <p className="text-gray-600">
-            Verstehe Linear Regression, Logistic Regression und Neural Networks durch interaktive Visualisierung
+            Verstehe Logistic Regression und Neural Networks durch interaktive Visualisierung
           </p>
         </div>
 
@@ -80,60 +80,11 @@ function SupervisedLearningTest() {
             Algorithmen im Detail
           </h2>
 
-          {/* Linear Regression */}
-          <div className="mb-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="text-lg font-bold text-blue-900 mb-3">
-                1️⃣ Linear Regression
-              </h3>
-              
-              <div className="text-sm text-blue-800 space-y-3">
-                <div>
-                  <strong>Modell:</strong> Finde die beste Gerade durch die Datenpunkte
-                </div>
-                
-                <div className="bg-white rounded p-3 space-y-2">
-                  <div className="font-mono text-xs">
-                    ŷ = w₁x₁ + w₂x₂ + b
-                  </div>
-                  <div className="text-xs">
-                    • <strong>ŷ:</strong> Prediction (continuous output)
-                    <br/>
-                    • <strong>w₁, w₂:</strong> Weights (slope)
-                    <br/>
-                    • <strong>b:</strong> Bias (intercept)
-                    <br/>
-                    • <strong>x₁, x₂:</strong> Input features
-                  </div>
-                </div>
-
-                <div>
-                  <strong>Loss Function (Mean Squared Error):</strong>
-                  <div className="bg-white rounded p-3 mt-2 font-mono text-xs">
-                    L = (1/n) Σ(yᵢ - ŷᵢ)²
-                  </div>
-                  <p className="mt-2 text-xs">
-                    Misst den durchschnittlichen quadratischen Fehler zwischen echten und vorhergesagten Werten
-                  </p>
-                </div>
-
-                <div>
-                  <strong>Gradient Descent Update:</strong>
-                  <div className="bg-white rounded p-3 mt-2 font-mono text-xs">
-                    w ← w - α · (2/n) Σ(ŷᵢ - yᵢ) · xᵢ
-                    <br/>
-                    b ← b - α · (2/n) Σ(ŷᵢ - yᵢ)
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Logistic Regression */}
           <div className="mb-6">
             <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
               <h3 className="text-lg font-bold text-purple-900 mb-3">
-                2️⃣ Logistic Regression
+                1️⃣ Logistic Regression
               </h3>
               
               <div className="text-sm text-purple-800 space-y-3">
@@ -186,7 +137,7 @@ function SupervisedLearningTest() {
           <div>
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <h3 className="text-lg font-bold text-green-900 mb-3">
-                3️⃣ Neural Network (Multi-Layer Perceptron)
+                2️⃣ Neural Network (Multi-Layer Perceptron)
               </h3>
               
               <div className="text-sm text-green-800 space-y-3">

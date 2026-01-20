@@ -26,7 +26,8 @@ function QLearningTest() {
             Interaktive Visualisierung von Q-Learning mit Live Q-Table Updates
           </p>
         </div>
-
+        {/* Playground */}
+        <QLearningPlayground />
         {/* Theory Section */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">
@@ -111,8 +112,7 @@ function QLearningTest() {
           </div>
         </div>
 
-        {/* Playground */}
-        <QLearningPlayground />
+        
 
         {/* Learning Objectives */}
         <div className="mt-8 bg-white rounded-xl border border-gray-200 p-6">

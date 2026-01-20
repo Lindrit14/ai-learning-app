@@ -7,7 +7,7 @@ function SupervisedLearningPlayground() {
   const canvasRef = useRef(null);
   
   // Algorithm selection
-  const [algorithm, setAlgorithm] = useState('linear'); // linear, logistic, neural
+  const [algorithm, setAlgorithm] = useState('logistic'); // logistic, neural
   
   // Data points
   const [dataPoints, setDataPoints] = useState([]);
@@ -44,22 +44,8 @@ function SupervisedLearningPlayground() {
     }
 
     let newModel;
-    
+
     switch (algorithm) {
-      case 'linear':
-        // Linear Regression: y = wx + b
-        newModel = tf.sequential();
-        newModel.add(tf.layers.dense({ 
-          units: 1, 
-          inputShape: [2],
-          useBias: true 
-        }));
-        newModel.compile({
-          optimizer: tf.train.sgd(learningRate),
-          loss: 'meanSquaredError'
-        });
-        break;
-        
       case 'logistic':
         // Logistic Regression: y = sigmoid(wx + b)
         newModel = tf.sequential();
@@ -116,32 +102,19 @@ function SupervisedLearningPlayground() {
   // Generate data
   const generateData = () => {
     const newPoints = [];
-    
-    if (algorithm === 'linear') {
-      // Linear regression data
-      for (let i = 0; i < 50; i++) {
-        const x = Math.random();
-        const y = 0.5 * x + 0.3 + (Math.random() - 0.5) * 0.2;
-        newPoints.push({ 
-          x, 
-          y: Math.max(0, Math.min(1, y)), 
-          class: 0 
-        });
-      }
-    } else {
-      // Classification data - two classes
-      // Class 0 (red)
-      for (let i = 0; i < 25; i++) {
-        const x = Math.random() * 0.5;
-        const y = Math.random() * 0.5;
-        newPoints.push({ x, y, class: 0 });
-      }
-      // Class 1 (blue)
-      for (let i = 0; i < 25; i++) {
-        const x = 0.5 + Math.random() * 0.5;
-        const y = 0.5 + Math.random() * 0.5;
-        newPoints.push({ x, y, class: 1 });
-      }
+
+    // Classification data - two classes
+    // Class 0 (red)
+    for (let i = 0; i < 25; i++) {
+      const x = Math.random() * 0.5;
+      const y = Math.random() * 0.5;
+      newPoints.push({ x, y, class: 0 });
+    }
+    // Class 1 (blue)
+    for (let i = 0; i < 25; i++) {
+      const x = 0.5 + Math.random() * 0.5;
+      const y = 0.5 + Math.random() * 0.5;
+      newPoints.push({ x, y, class: 1 });
     }
     
     setDataPoints(newPoints);
@@ -180,9 +153,7 @@ function SupervisedLearningPlayground() {
     if (!model || dataPoints.length < 2) return;
 
     const xs = tf.tensor2d(dataPoints.map(p => [p.x, p.y]));
-    const ys = algorithm === 'linear'
-      ? tf.tensor2d(dataPoints.map(p => [p.y]))
-      : tf.tensor2d(dataPoints.map(p => [p.class]));
+    const ys = tf.tensor2d(dataPoints.map(p => [p.class]));
 
     const history = await model.fit(xs, ys, {
       epochs: 1,
@@ -192,8 +163,8 @@ function SupervisedLearningPlayground() {
 
     const currentLoss = history.history.loss[0];
     setLoss(currentLoss);
-    
-    if (algorithm !== 'linear' && history.history.acc) {
+
+    if (history.history.acc) {
       setAccuracy(history.history.acc[0]);
     }
 
@@ -264,25 +235,19 @@ function SupervisedLearningPlayground() {
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, width, height);
 
-    // Draw background predictions (decision boundary/regression surface)
+    // Draw background predictions (decision boundary)
     if (predictions.length > 0) {
       predictions.forEach(pred => {
         const x = toCanvasX(pred.x);
         const y = toCanvasY(pred.y);
-        
-        if (algorithm === 'linear') {
-          // For regression, show prediction as intensity
-          const intensity = Math.floor(pred.value * 255);
-          ctx.fillStyle = `rgba(100, 100, 255, ${pred.value * 0.3})`;
+
+        // For classification, show decision boundary
+        const prob = pred.value;
+        if (prob < 0.45 || prob > 0.55) {
+          const color = prob > 0.5 ? 'rgba(100, 150, 255, 0.2)' : 'rgba(255, 100, 100, 0.2)';
+          ctx.fillStyle = color;
         } else {
-          // For classification, show decision boundary
-          const prob = pred.value;
-          if (prob < 0.45 || prob > 0.55) {
-            const color = prob > 0.5 ? 'rgba(100, 150, 255, 0.2)' : 'rgba(255, 100, 100, 0.2)';
-            ctx.fillStyle = color;
-          } else {
-            ctx.fillStyle = 'rgba(255, 255, 0, 0.3)'; // Decision boundary
-          }
+          ctx.fillStyle = 'rgba(255, 255, 0, 0.3)'; // Decision boundary
         }
         ctx.fillRect(x - 3, y - 3, 6, 6);
       });
@@ -321,16 +286,12 @@ function SupervisedLearningPlayground() {
     dataPoints.forEach(point => {
       const x = toCanvasX(point.x);
       const y = toCanvasY(point.y);
-      
+
       ctx.beginPath();
       ctx.arc(x, y, 6, 0, Math.PI * 2);
-      
-      if (algorithm === 'linear') {
-        ctx.fillStyle = '#3b82f6';
-      } else {
-        ctx.fillStyle = point.class === 0 ? '#ef4444' : '#3b82f6';
-      }
-      
+
+      ctx.fillStyle = point.class === 0 ? '#ef4444' : '#3b82f6';
+
       ctx.fill();
       ctx.strokeStyle = '#fff';
       ctx.lineWidth = 2;
@@ -348,12 +309,6 @@ function SupervisedLearningPlayground() {
   // Get activation function formula
   const getFormulaDisplay = () => {
     switch (algorithm) {
-      case 'linear':
-        return {
-          title: 'Linear Regression',
-          formula: 'ŷ = w₁x₁ + w₂x₂ + b',
-          loss: 'MSE = (1/n)Σ(y - ŷ)²'
-        };
       case 'logistic':
         return {
           title: 'Logistic Regression',
@@ -389,23 +344,7 @@ function SupervisedLearningPlayground() {
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Algorithmus auswählen:
         </label>
-        <div className="grid grid-cols-3 gap-3">
-          <button
-            onClick={() => {
-              setAlgorithm('linear');
-              reset();
-            }}
-            className={`px-4 py-3 rounded-lg font-medium transition-all ${
-              algorithm === 'linear'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
-            }`}
-          >
-            <div className="text-left">
-              <div>Linear Regression</div>
-              <div className="text-xs opacity-75">Continuous Output</div>
-            </div>
-          </button>
+        <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => {
               setAlgorithm('logistic');
@@ -455,20 +394,18 @@ function SupervisedLearningPlayground() {
                 <Plus className="w-4 h-4" />
                 Generate
               </button>
-              {algorithm !== 'linear' && (
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => setCurrentClass(0)}
-                    className={`w-8 h-8 rounded ${currentClass === 0 ? 'ring-2 ring-gray-900' : ''}`}
-                    style={{ backgroundColor: '#ef4444' }}
-                  />
-                  <button
-                    onClick={() => setCurrentClass(1)}
-                    className={`w-8 h-8 rounded ${currentClass === 1 ? 'ring-2 ring-gray-900' : ''}`}
-                    style={{ backgroundColor: '#3b82f6' }}
-                  />
-                </div>
-              )}
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setCurrentClass(0)}
+                  className={`w-8 h-8 rounded ${currentClass === 0 ? 'ring-2 ring-gray-900' : ''}`}
+                  style={{ backgroundColor: '#ef4444' }}
+                />
+                <button
+                  onClick={() => setCurrentClass(1)}
+                  className={`w-8 h-8 rounded ${currentClass === 1 ? 'ring-2 ring-gray-900' : ''}`}
+                  style={{ backgroundColor: '#3b82f6' }}
+                />
+              </div>
             </div>
           </div>
           
@@ -481,11 +418,7 @@ function SupervisedLearningPlayground() {
           />
           
           <div className="mt-3 text-sm text-gray-600">
-            {algorithm === 'linear' ? (
-              <span>Blue dots = data points | Blue overlay = predictions</span>
-            ) : (
-              <span>Red = Class 0 | Blue = Class 1 | Yellow = Decision Boundary</span>
-            )}
+            <span>Red = Class 0 | Blue = Class 1 | Yellow = Decision Boundary</span>
           </div>
         </div>
 
@@ -589,13 +522,9 @@ function SupervisedLearningPlayground() {
           </p>
         </div>
         <div className="bg-green-50 rounded-lg p-4">
-          <p className="text-sm text-gray-600 mb-1">
-            {algorithm === 'linear' ? 'MSE' : 'Accuracy'}
-          </p>
+          <p className="text-sm text-gray-600 mb-1">Accuracy</p>
           <p className="text-2xl font-bold text-green-600">
-            {algorithm === 'linear' 
-              ? (loss > 0 ? loss.toFixed(4) : '-')
-              : (accuracy > 0 ? `${(accuracy * 100).toFixed(1)}%` : '-')}
+            {accuracy > 0 ? `${(accuracy * 100).toFixed(1)}%` : '-'}
           </p>
         </div>
         <div className="bg-gray-50 rounded-lg p-4">
@@ -713,9 +642,9 @@ function SupervisedLearningPlayground() {
         <h3 className="font-semibold text-blue-900 mb-2">💡 How to use:</h3>
         <ul className="text-sm text-blue-800 space-y-1">
           <li>• Click "Generate" to create random data or click on canvas to add points</li>
-          <li>• {algorithm !== 'linear' && 'Select class (red/blue) before adding points'}</li>
+          <li>• Select class (red/blue) before adding points</li>
           <li>• Click "Start Training" to train the model with gradient descent</li>
-          <li>• Watch the {algorithm === 'linear' ? 'regression line' : 'decision boundary'} form!</li>
+          <li>• Watch the decision boundary form!</li>
           <li>• Adjust hyperparameters to see their effect on training</li>
         </ul>
       </div>

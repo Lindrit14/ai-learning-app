@@ -20,8 +20,8 @@ function Header() {
               <Brain className="w-5 h-5 text-white" />
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-lg font-bold text-gray-900">AI Learning Lab</h1>
-              <p className="text-xs text-gray-500">FH Campus Wien</p>
+              <h1 className="text-lg font-bold text-gray-900">PlAIGround</h1>
+              
             </div>
           </Link>
 

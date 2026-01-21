@@ -16,14 +16,58 @@ function EightPuzzleTest() {
           Zurück zur Startseite
         </Link>
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            8-Puzzle Problem mit A* Search
-          </h1>
-          <p className="text-gray-600">
-            Vergleiche Hamming vs Manhattan Heuristiken und lerne über Admissibility & Effective Branching Factor
-          </p>
+             {/* Experiments */}
+        <div className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            🧪 Experimente
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="bg-white rounded-lg p-4">
+              <strong className="text-gray-900">Experiment 1: Hamming vs Manhattan</strong>
+              <p className="text-sm text-gray-700 mt-2">
+                1. Shuffle puzzle<br/>
+                2. Löse mit h₁ (Hamming) → Notiere: Nodes Generated, b*<br/>
+                3. Reset to Goal, Shuffle gleich<br/>
+                4. Löse mit h₂ (Manhattan) → Notiere: Nodes Generated, b*<br/>
+                5. Vergleiche! Manhattan sollte effizienter sein.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-lg p-4">
+              <strong className="text-gray-900">Experiment 2: Admissibility prüfen</strong>
+              <p className="text-sm text-gray-700 mt-2">
+                1. Shuffle puzzle<br/>
+                2. Notiere h₁ und h₂ Werte während der Suche<br/>
+                3. Nach Lösung: h ≤ tatsächliche Schritte?<br/>
+                4. Beide sollten admissible sein!
+              </p>
+            </div>
+
+            <div className="bg-white rounded-lg p-4">
+              <strong className="text-gray-900">Experiment 3: Dominanz beobachten</strong>
+              <p className="text-sm text-gray-700 mt-2">
+                1. Bei jedem State während Suche<br/>
+                2. Vergleiche h₁ und h₂ Werte<br/>
+                3. h₂ ≥ h₁ sollte immer gelten<br/>
+                4. Manhattan ist stärkere Heuristik!
+              </p>
+            </div>
+
+            <div className="bg-white rounded-lg p-4">
+              <strong className="text-gray-900">Experiment 4: Effective Branching Factor</strong>
+              <p className="text-sm text-gray-700 mt-2">
+                1. Löse mehrere Puzzles mit beiden Heuristiken<br/>
+                2. Durchschnittliche b* berechnen<br/>
+                3. Manhattan sollte durchgehend niedrigere b* haben<br/>
+                4. Typisch: h₁ ≈ 1.8, h₂ ≈ 1.3
+              </p>
+            </div>
+          </div>
         </div>
+
+         {/* Playground */}
+        <EightPuzzlePlayground />
 
         {/* Problem Definition */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
@@ -186,8 +230,7 @@ function EightPuzzleTest() {
           </div>
         </div>
 
-        {/* Playground */}
-        <EightPuzzlePlayground />
+       
 
         {/* Admissibility */}
         <div className="mt-8 bg-white rounded-xl border border-gray-200 p-6">
@@ -365,55 +408,7 @@ b* ≈ (low + high) / 2`}
           </div>
         </div>
 
-        {/* Experiments */}
-        <div className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-xl p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">
-            🧪 Experimente
-          </h2>
-          
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-white rounded-lg p-4">
-              <strong className="text-gray-900">Experiment 1: Hamming vs Manhattan</strong>
-              <p className="text-sm text-gray-700 mt-2">
-                1. Shuffle puzzle<br/>
-                2. Löse mit h₁ (Hamming) → Notiere: Nodes Generated, b*<br/>
-                3. Reset to Goal, Shuffle gleich<br/>
-                4. Löse mit h₂ (Manhattan) → Notiere: Nodes Generated, b*<br/>
-                5. Vergleiche! Manhattan sollte effizienter sein.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg p-4">
-              <strong className="text-gray-900">Experiment 2: Admissibility prüfen</strong>
-              <p className="text-sm text-gray-700 mt-2">
-                1. Shuffle puzzle<br/>
-                2. Notiere h₁ und h₂ Werte während der Suche<br/>
-                3. Nach Lösung: h ≤ tatsächliche Schritte?<br/>
-                4. Beide sollten admissible sein!
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg p-4">
-              <strong className="text-gray-900">Experiment 3: Dominanz beobachten</strong>
-              <p className="text-sm text-gray-700 mt-2">
-                1. Bei jedem State während Suche<br/>
-                2. Vergleiche h₁ und h₂ Werte<br/>
-                3. h₂ ≥ h₁ sollte immer gelten<br/>
-                4. Manhattan ist stärkere Heuristik!
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg p-4">
-              <strong className="text-gray-900">Experiment 4: Effective Branching Factor</strong>
-              <p className="text-sm text-gray-700 mt-2">
-                1. Löse mehrere Puzzles mit beiden Heuristiken<br/>
-                2. Durchschnittliche b* berechnen<br/>
-                3. Manhattan sollte durchgehend niedrigere b* haben<br/>
-                4. Typisch: h₁ ≈ 1.8, h₂ ≈ 1.3
-              </p>
-            </div>
-          </div>
-        </div>
+  
       </div>
     </div>
   );

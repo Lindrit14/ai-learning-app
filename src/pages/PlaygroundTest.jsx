@@ -18,14 +18,12 @@ function PlaygroundTest() {
         </Link>
 
         {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Playground Test
-          </h1>
-          <p className="text-gray-600">
-            Teste das Linear Regression Playground
-          </p>
-        </div>
+       
+
+
+      {/* Playground */}
+        <LinearRegressionPlayground />
+
 
         {/* Theory Section (Optional) */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
@@ -63,8 +61,7 @@ function PlaygroundTest() {
           </div>
         </div>
 
-        {/* Playground */}
-        <LinearRegressionPlayground />
+        
 
         {/* Explanation Section */}
         <div className="mt-8 bg-white rounded-xl border border-gray-200 p-6">

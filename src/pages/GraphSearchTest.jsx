@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import GraphSearchPlayground from '../components/playground/GraphSearchPlayground';
+import GraphSearchPlayground from '../components/playground/GraphSearchPlayground'; 
 
 function GraphSearchTest() {
   return (
@@ -26,6 +26,8 @@ function GraphSearchTest() {
             Lerne BFS, DFS, UCS, Greedy Best-First und A* durch interaktive Visualisierung
           </p>
         </div>
+
+        
 
         {/* Theory Section */}
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">

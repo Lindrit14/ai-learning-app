@@ -1,6 +1,6 @@
 // src/components/playground/QLearningPlayground.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Pause, RotateCcw, Settings, Zap, Brain } from 'lucide-react';
+import { Play, Pause, RotateCcw, Settings, Zap, Brain, Shuffle } from 'lucide-react';
 
 function QLearningPlayground() {
   // Grid configuration
@@ -24,7 +24,7 @@ function QLearningPlayground() {
   // Environment state
   const [agentPos, setAgentPos] = useState({ x: 0, y: 0 });
   const [goalPos] = useState({ x: 4, y: 4 });
-  const [obstacles] = useState([
+  const [obstacles, setObstacles] = useState([
     { x: 1, y: 1 },
     { x: 2, y: 2 },
     { x: 3, y: 1 }
@@ -239,6 +239,109 @@ function QLearningPlayground() {
 
     return () => clearTimeout(timer);
   }, [isTraining, agentPos, step, qTable]);
+
+  // BFS to check if path exists from start to goal
+  const hasPathToGoal = (obstacleList) => {
+    const queue = [{ x: 0, y: 0 }];
+    const visited = new Set();
+    visited.add('0,0');
+
+    while (queue.length > 0) {
+      const current = queue.shift();
+
+      // Check if we reached the goal
+      if (current.x === goalPos.x && current.y === goalPos.y) {
+        return true;
+      }
+
+      // Try all four directions
+      for (const action of actions) {
+        const vector = actionVectors[action];
+        const next = {
+          x: current.x + vector.dx,
+          y: current.y + vector.dy
+        };
+
+        const key = `${next.x},${next.y}`;
+
+        // Check if valid and not visited
+        if (
+          next.x >= 0 && next.x < gridSize &&
+          next.y >= 0 && next.y < gridSize &&
+          !obstacleList.some(obs => obs.x === next.x && obs.y === next.y) &&
+          !visited.has(key)
+        ) {
+          visited.add(key);
+          queue.push(next);
+        }
+      }
+    }
+
+    return false;
+  };
+
+  // Generate random obstacles with guaranteed path
+  const randomizeObstacles = () => {
+    let newObstacles = [];
+    let attempts = 0;
+    const maxAttempts = 100;
+
+    do {
+      newObstacles = [];
+      const numObstacles = Math.floor(Math.random() * 6) + 3; // 3-8 obstacles
+
+      for (let i = 0; i < numObstacles; i++) {
+        let x, y;
+        let isValid = false;
+
+        // Try to find a valid position
+        for (let j = 0; j < 50; j++) {
+          x = Math.floor(Math.random() * gridSize);
+          y = Math.floor(Math.random() * gridSize);
+
+          // Don't place obstacle on start or goal
+          const isStart = x === 0 && y === 0;
+          const isGoal = x === goalPos.x && y === goalPos.y;
+          const isDuplicate = newObstacles.some(obs => obs.x === x && obs.y === y);
+
+          if (!isStart && !isGoal && !isDuplicate) {
+            isValid = true;
+            break;
+          }
+        }
+
+        if (isValid) {
+          newObstacles.push({ x, y });
+        }
+      }
+
+      attempts++;
+    } while (!hasPathToGoal(newObstacles) && attempts < maxAttempts);
+
+    // If we couldn't find a valid configuration, use a simple safe one
+    if (!hasPathToGoal(newObstacles)) {
+      newObstacles = [
+        { x: 1, y: 1 },
+        { x: 3, y: 3 }
+      ];
+    }
+
+    setObstacles(newObstacles);
+
+    // Reset the agent and Q-table when obstacles change
+    setIsTraining(false);
+    setEpisode(0);
+    setStep(0);
+    setTotalReward(0);
+    setEpisodeRewards([]);
+    setAgentPos({ x: 0, y: 0 });
+    setEpsilon(1.0);
+    setActionHistory([]);
+    setCurrentAction(null);
+    setLastUpdate(null);
+    setSelectedCell(null);
+    initializeQTable();
+  };
 
   // Reset everything
   const reset = () => {
@@ -509,6 +612,15 @@ function QLearningPlayground() {
           </button>
 
           <button
+            onClick={randomizeObstacles}
+            disabled={isTraining}
+            className="flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-all disabled:opacity-50"
+          >
+            <Shuffle className="w-5 h-5" />
+            Randomize Walls
+          </button>
+
+          <button
             onClick={runStep}
             disabled={isTraining}
             className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-all disabled:opacity-50"
@@ -598,6 +710,7 @@ function QLearningPlayground() {
         <h3 className="font-semibold text-blue-900 mb-2">💡 How to use:</h3>
         <ul className="text-sm text-blue-800 space-y-1">
           <li>• Click <strong>Start Training</strong> to watch the agent learn</li>
+          <li>• Click <strong>Randomize Walls</strong> to generate a new maze layout with guaranteed path to goal</li>
           <li>• Click <strong>Single Step</strong> to step through one action at a time</li>
           <li>• Click on any grid cell to see its Q-values for all actions</li>
           <li>• Blue arrows show the learned policy (best action per state)</li>
